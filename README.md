@@ -69,7 +69,25 @@ nature of the data. Yet, we've attempted to make the experience as similar as po
 | **Jira**  | <a href="#"><img alt="Jira Cloud" src="https://img.shields.io/badge/Jira Cloud-%E2%9C%93-dark--green?logo=jira&style=flat-square" /></a><a href="#"><img alt="Jira Server" src="https://img.shields.io/badge/Jira Server-%E2%9C%93-dark--green?logo=jira&style=flat-square" /></a> |
 
 ## Installation
-`jira-cli` is available as a downloadable packaged binary for Linux, macOS, and Windows from the [releases page](https://github.com/ankitpokhrel/jira-cli/releases).
+`jira-cli` is available as a downloadable packaged binary for Linux, macOS, and Windows from the [releases page](https://github.com/missedone/jira-cli/releases).
+
+Install the latest release on Linux or macOS:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/missedone/jira-cli/main/install.sh | bash
+```
+
+To install a specific release, pass its tag to the installer:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/missedone/jira-cli/main/install.sh | bash -s -- v1.8.0
+```
+
+The installer writes to `/usr/local/bin` by default. Set `JIRA_CLI_INSTALL_DIR` to use another directory:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/missedone/jira-cli/main/install.sh | JIRA_CLI_INSTALL_DIR="$HOME/.local/bin" bash
+```
 
 You can use Docker to quickly try out `jira-cli`.
 

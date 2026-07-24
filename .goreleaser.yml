@@ -4,7 +4,7 @@ project_name: jira
 release:
   prerelease: auto
   name_template: "v{{.Version}}"
-  draft: true
+  draft: false
   mode: "keep-existing"
 
 before:
