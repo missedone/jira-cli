@@ -1,4 +1,4 @@
-.PHONY: all deps build install lint test ci jira.server clean distclean
+.PHONY: all deps build release install lint test ci jira.server clean distclean
 
 ##############
 # Build vars #
@@ -29,6 +29,8 @@ export LDFLAGS += -w
 
 export CGO_ENABLED ?= 0
 export GOCACHE ?= $(CURDIR)/.gocache
+GORELEASER ?= goreleaser
+GORELEASER_CONFIG ?= .goreleaser.yml
 
 all: build
 
@@ -37,6 +39,9 @@ deps:
 
 build: deps
 	go build -ldflags='$(LDFLAGS)' ./...
+
+release:
+	$(GORELEASER) build --config $(GORELEASER_CONFIG) --clean --snapshot
 
 install:
 	go install -ldflags='$(LDFLAGS)' ./...
