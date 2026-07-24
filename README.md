@@ -502,6 +502,16 @@ $ jira issue delete ISSUE-1
 $ jira issue delete ISSUE-1 --cascade
 ```
 
+#### Attachment
+The `attachment download` command saves an attachment from an issue. By default, the attachment is saved to the current directory using its Jira filename.
+
+```sh
+$ jira issue attachment download ISSUE-1 10001
+
+# Save the attachment to a specific path
+$ jira issue attachment download ISSUE-1 10001 --output ./downloads/report.pdf
+```
+
 #### Comment
 The `comment` command provides a list of sub-commands to manage issue comments.
 

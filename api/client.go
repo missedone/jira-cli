@@ -1,6 +1,7 @@
 package api
 
 import (
+	"io"
 	"time"
 
 	"github.com/spf13/viper"
@@ -227,4 +228,22 @@ func ProxyWatchIssue(c *jira.Client, key string, user *jira.User) error {
 		return c.WatchIssueV2(key, assignee)
 	}
 	return c.WatchIssue(key, assignee)
+}
+
+// ProxyGetIssueAttachment fetches attachment metadata from an issue using the
+// API version appropriate for the configured installation type.
+func ProxyGetIssueAttachment(c *jira.Client, issueKey, attachmentID string) (*jira.Attachment, error) {
+	if viper.GetString("installation") == jira.InstallationTypeLocal {
+		return c.GetIssueAttachmentV2(issueKey, attachmentID)
+	}
+	return c.GetIssueAttachment(issueKey, attachmentID)
+}
+
+// ProxyDownloadAttachment downloads attachment content using the API version
+// appropriate for the configured installation type.
+func ProxyDownloadAttachment(c *jira.Client, attachmentID string, dst io.Writer) error {
+	if viper.GetString("installation") == jira.InstallationTypeLocal {
+		return c.DownloadAttachmentV2(attachmentID, dst)
+	}
+	return c.DownloadAttachment(attachmentID, dst)
 }
