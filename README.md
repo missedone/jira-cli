@@ -524,6 +524,10 @@ $ jira issue delete ISSUE-1 --cascade
 The `attachment download` command saves an attachment from an issue. By default, the attachment is saved to the current directory using its Jira filename.
 
 ```sh
+# List the issue's attachment IDs (requires jq)
+$ jira issue view ISSUE-1 --raw | jq -r '.fields.attachment[].id'
+
+# Download an attachment by ID
 $ jira issue attachment download ISSUE-1 10001
 
 # Save the attachment to a specific path
