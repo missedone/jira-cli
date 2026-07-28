@@ -80,7 +80,7 @@ curl -fsSL https://raw.githubusercontent.com/missedone/jira-cli/main/install.sh 
 To install a specific release, pass its tag to the installer:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/missedone/jira-cli/main/install.sh | bash -s -- v1.8.0
+curl -fsSL https://raw.githubusercontent.com/missedone/jira-cli/main/install.sh | bash -s -- v1.8.1
 ```
 
 The installer writes to `/usr/local/bin` by default. Set `JIRA_CLI_INSTALL_DIR` to use another directory:
@@ -91,17 +91,35 @@ curl -fsSL https://raw.githubusercontent.com/missedone/jira-cli/main/install.sh 
 
 ### Windows
 
-Download the `windows_x86_64` ZIP from the [releases page](https://github.com/missedone/jira-cli/releases). Then, in PowerShell:
+In PowerShell, set the version you want to install and download its `windows_x86_64` package from [GitHub Releases](https://github.com/missedone/jira-cli/releases):
 
 ```powershell
-$archive = ".\jira_<version>_windows_x86_64.zip"
+$version = "1.8.1"
+$archive = "jira_${version}_windows_x86_64.zip"
+$archivePath = Join-Path $env:TEMP $archive
 $installDir = "$env:LOCALAPPDATA\Programs\jira-cli"
+$downloadUrl = "https://github.com/missedone/jira-cli/releases/download/v${version}/${archive}"
 
+Invoke-WebRequest -Uri $downloadUrl -OutFile $archivePath
 New-Item -ItemType Directory -Force $installDir | Out-Null
-Expand-Archive -Path $archive -DestinationPath $installDir -Force
+Expand-Archive -Path $archivePath -DestinationPath $installDir -Force
 ```
 
-Add `$env:LOCALAPPDATA\Programs\jira-cli\bin` to your user `PATH`, open a new terminal, and verify the installation:
+Add the extracted `bin` directory permanently to your user `PATH` and make it available in the current PowerShell session:
+
+```powershell
+$binDir = Join-Path $installDir "bin"
+$userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+
+if (($userPath -split ";") -notcontains $binDir) {
+    $newPath = if ([string]::IsNullOrWhiteSpace($userPath)) { $binDir } else { "$userPath;$binDir" }
+    [Environment]::SetEnvironmentVariable("Path", $newPath, "User")
+}
+
+$env:Path = "$env:Path;$binDir"
+```
+
+Verify the installation:
 
 ```powershell
 jira version
