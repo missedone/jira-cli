@@ -2,13 +2,14 @@ package man
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
 )
 
 const (
-	examples = `# Generate man pages in default location /tmp/man-jira-cli
+	examples = `# Generate man pages in the default temporary directory
 $ jira man --generate
 
 # Generate man pages in specified location
@@ -17,6 +18,8 @@ $ jira man --generate --output /path/to/man-pages`
 
 // NewCmdMan is a man command.
 func NewCmdMan() *cobra.Command {
+	defaultOutput := filepath.Join(os.TempDir(), "man-jira-cli")
+
 	cmd := cobra.Command{
 		Use:     "man",
 		Short:   "Help generate man(7) pages for Jira CLI",
@@ -26,7 +29,7 @@ func NewCmdMan() *cobra.Command {
 	}
 
 	cmd.Flags().BoolP("generate", "g", false, "Generate the man pages for Jira CLI")
-	cmd.Flags().StringP("output", "o", "/tmp/man-jira-cli", "Name of the directory where the man pages would be generated")
+	cmd.Flags().StringP("output", "o", defaultOutput, "Name of the directory where the man pages would be generated")
 
 	return &cmd
 }

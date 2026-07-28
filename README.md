@@ -64,7 +64,7 @@ features like issue creation, cloning, linking, ticket transition, and much more
 > Some features might work slightly differently in cloud installation versus on-premise installation due to the
 nature of the data. Yet, we've attempted to make the experience as similar as possible.
 
-| Platform | <a href="#"><img alt="Linux" src="https://img.shields.io/badge/Linux-%E2%9C%93-dark--green?logo=linux&logoColor=white&style=flat-square" /></a><a href="#"><img alt="macOS" src="https://img.shields.io/badge/macOS-%E2%9C%93-dark--green?logo=apple&style=flat-square" /></a><a href="#"><img alt="FreeBSD" src="https://img.shields.io/badge/FreeBSD-%E2%9C%93-dark--green?logo=freebsd&style=flat-square" /></a><a href="#"><img alt="NetBSD" src="https://img.shields.io/badge/NetBSD-%E2%9C%93-dark--green?logo=netbsd&logoColor=white&style=flat-square" /></a><a href="#"><img alt="Windows" src="https://img.shields.io/badge/Windows-partial-yellow?logo=windows&style=flat-square" /></a> |
+| Platform | <a href="#"><img alt="Linux" src="https://img.shields.io/badge/Linux-%E2%9C%93-dark--green?logo=linux&logoColor=white&style=flat-square" /></a><a href="#"><img alt="macOS" src="https://img.shields.io/badge/macOS-%E2%9C%93-dark--green?logo=apple&style=flat-square" /></a><a href="#"><img alt="FreeBSD" src="https://img.shields.io/badge/FreeBSD-%E2%9C%93-dark--green?logo=freebsd&style=flat-square" /></a><a href="#"><img alt="NetBSD" src="https://img.shields.io/badge/NetBSD-%E2%9C%93-dark--green?logo=netbsd&logoColor=white&style=flat-square" /></a><a href="#"><img alt="Windows" src="https://img.shields.io/badge/Windows-%E2%9C%93-dark--green?logo=windows&style=flat-square" /></a> |
 | :------------- | :----------: |
 | **Jira**  | <a href="#"><img alt="Jira Cloud" src="https://img.shields.io/badge/Jira Cloud-%E2%9C%93-dark--green?logo=jira&style=flat-square" /></a><a href="#"><img alt="Jira Server" src="https://img.shields.io/badge/Jira Server-%E2%9C%93-dark--green?logo=jira&style=flat-square" /></a> |
 
@@ -87,6 +87,24 @@ The installer writes to `/usr/local/bin` by default. Set `JIRA_CLI_INSTALL_DIR` 
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/missedone/jira-cli/main/install.sh | JIRA_CLI_INSTALL_DIR="$HOME/.local/bin" bash
+```
+
+### Windows
+
+Download the `windows_x86_64` ZIP from the [releases page](https://github.com/missedone/jira-cli/releases). Then, in PowerShell:
+
+```powershell
+$archive = ".\jira_<version>_windows_x86_64.zip"
+$installDir = "$env:LOCALAPPDATA\Programs\jira-cli"
+
+New-Item -ItemType Directory -Force $installDir | Out-Null
+Expand-Archive -Path $archive -DestinationPath $installDir -Force
+```
+
+Add `$env:LOCALAPPDATA\Programs\jira-cli\bin` to your user `PATH`, open a new terminal, and verify the installation:
+
+```powershell
+jira version
 ```
 
 You can use Docker to quickly try out `jira-cli`.
@@ -145,7 +163,7 @@ default.
   * In case `JIRA_API_TOKEN` variable is set it will be used together with `mtls`.
 
 #### Shell completion
-Check `jira completion --help` for more info on setting up a bash/zsh shell completion.
+Check `jira completion --help` for more info on setting up Bash, Zsh, Fish, or PowerShell completion.
 
 #### Multiple projects
 

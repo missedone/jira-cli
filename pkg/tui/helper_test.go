@@ -124,15 +124,17 @@ func TestSplitText(t *testing.T) {
 }
 
 func TestGetPager(t *testing.T) {
+	assert.Empty(t, getPager("windows"))
+
 	// TERM is xterm, JIRA_PAGER is not set, PAGER is set.
 	{
 		t.Setenv("TERM", "xterm")
 
 		t.Setenv("PAGER", "")
-		assert.Equal(t, "less", GetPager())
+		assert.Equal(t, "less", getPager("linux"))
 
 		t.Setenv("PAGER", "more")
-		assert.Equal(t, "more", GetPager())
+		assert.Equal(t, "more", getPager("linux"))
 
 		t.Setenv("PAGER", "")
 	}
@@ -140,13 +142,13 @@ func TestGetPager(t *testing.T) {
 	// TERM is set, JIRA_PAGER is not set, PAGER is unset.
 	{
 		t.Setenv("TERM", "dumb")
-		assert.Equal(t, "cat", GetPager())
+		assert.Equal(t, "cat", getPager("linux"))
 
 		t.Setenv("TERM", "")
-		assert.Equal(t, "cat", GetPager())
+		assert.Equal(t, "cat", getPager("linux"))
 
 		t.Setenv("TERM", "xterm")
-		assert.Equal(t, "less", GetPager())
+		assert.Equal(t, "less", getPager("linux"))
 	}
 
 	// TERM is set, JIRA_PAGER is set, PAGER is unset.
@@ -154,13 +156,13 @@ func TestGetPager(t *testing.T) {
 		t.Setenv("JIRA_PAGER", "bat")
 
 		t.Setenv("TERM", "dumb")
-		assert.Equal(t, "cat", GetPager())
+		assert.Equal(t, "cat", getPager("linux"))
 
 		t.Setenv("TERM", "")
-		assert.Equal(t, "cat", GetPager())
+		assert.Equal(t, "cat", getPager("linux"))
 
 		t.Setenv("TERM", "xterm")
-		assert.Equal(t, "bat", GetPager())
+		assert.Equal(t, "bat", getPager("linux"))
 	}
 
 	// TERM gets precedence if both PAGER and TERM are set.
@@ -168,14 +170,14 @@ func TestGetPager(t *testing.T) {
 		t.Setenv("TERM", "")
 		t.Setenv("PAGER", "")
 		t.Setenv("JIRA_PAGER", "")
-		assert.Equal(t, "cat", GetPager())
+		assert.Equal(t, "cat", getPager("linux"))
 
 		t.Setenv("PAGER", "more")
 		t.Setenv("TERM", "dumb")
-		assert.Equal(t, "cat", GetPager())
+		assert.Equal(t, "cat", getPager("linux"))
 
 		t.Setenv("PAGER", "more")
 		t.Setenv("TERM", "xterm")
-		assert.Equal(t, "more", GetPager())
+		assert.Equal(t, "more", getPager("linux"))
 	}
 }

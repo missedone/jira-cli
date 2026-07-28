@@ -2,6 +2,7 @@ package cmdutil
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -70,7 +71,7 @@ func TestGetConfigHome(t *testing.T) {
 
 	configHome, err := GetConfigHome()
 	assert.NoError(t, err)
-	assert.Equal(t, userHome+"/.config", configHome)
+	assert.Equal(t, filepath.Join(userHome, ".config"), configHome)
 
 	assert.NoError(t, os.Setenv("XDG_CONFIG_HOME", "./test"))
 

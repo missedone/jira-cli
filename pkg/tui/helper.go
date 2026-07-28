@@ -83,7 +83,11 @@ func IsNotTTY() bool {
 
 // GetPager returns configured pager.
 func GetPager() string {
-	if runtime.GOOS == "windows" {
+	return getPager(runtime.GOOS)
+}
+
+func getPager(goos string) string {
+	if goos == "windows" {
 		return ""
 	}
 	if IsDumbTerminal() {

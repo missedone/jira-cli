@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -125,7 +126,7 @@ func GetConfigHome() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return home + "/.config", nil
+	return filepath.Join(home, ".config"), nil
 }
 
 // StdinHasData checks if standard input has any data to be processed.
