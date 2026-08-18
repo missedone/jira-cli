@@ -194,6 +194,24 @@ $ JIRA_CONFIG_FILE=./local_jira_config.yaml jira issue list
 $ jira issue list -c ./local_jira_config.yaml
 ```
 
+#### Environment-only configuration
+
+A configuration file is optional when the Jira connection is configured with
+environment variables. At minimum, set `JIRA_SERVER`, `JIRA_LOGIN`, and
+`JIRA_API_TOKEN`:
+
+```sh
+export JIRA_INSTALLATION=Cloud
+export JIRA_SERVER=https://your-company.atlassian.net
+export JIRA_LOGIN=you@example.com
+export JIRA_AUTH_TYPE=basic
+export JIRA_API_TOKEN=your-token
+```
+
+Configuration keys containing dots use underscores in environment variable
+names. For example, `project.key` and `project.type` can be set with
+`JIRA_PROJECT_KEY` and `JIRA_PROJECT_TYPE`.
+
 ## Usage
 The tool currently comes with an issue, epic, and sprint explorer. The flags are [POSIX-compliant](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html).
 You can combine available flags in any order to create a unique query. For example, the command below will give you high priority issues created this month
