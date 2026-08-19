@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"slices"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -62,6 +63,7 @@ func init() {
 
 		viper.AutomaticEnv()
 		viper.SetEnvPrefix("jira")
+		viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 		if err := viper.ReadInConfig(); err == nil && debug {
 			fmt.Printf("Using config file: %s\n", viper.ConfigFileUsed())
@@ -90,8 +92,8 @@ func NewCmdRoot() *cobra.Command {
 			}
 
 			configFile := viper.ConfigFileUsed()
-			if !jiraConfig.Exists(configFile) {
-				cmdutil.Failed("Missing configuration file.\nRun 'jira init' to configure the tool.")
+			if !jiraConfig.Exists(configFile) && !hasEnvironmentConfig() {
+				cmdutil.Failed("Missing configuration.\nRun 'jira init' or set JIRA_SERVER and JIRA_LOGIN.")
 			}
 		},
 	}
@@ -123,6 +125,10 @@ func NewCmdRoot() *cobra.Command {
 	addChildCommands(&cmd)
 
 	return &cmd
+}
+
+func hasEnvironmentConfig() bool {
+	return viper.GetString("server") != "" && viper.GetString("login") != ""
 }
 
 func addChildCommands(cmd *cobra.Command) {
