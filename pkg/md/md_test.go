@@ -108,9 +108,9 @@ func main\(\) {
 	assert.Equal(t, expected, ToJiraMD(jfm))
 }
 
-func TestToJiraMDDoesNotWrapIssueKeyCodeSpans(t *testing.T) {
+func TestToJiraMDKeepsMarkdownInlineCode(t *testing.T) {
 	input := "See `PROJ-123`, `APP2-42`, `logs/PROJ-123-run.txt`, and `COMMAND`."
-	expected := "See PROJ-123, APP2-42, logs/PROJ-123-run.txt, and {{COMMAND}}.\n\n"
+	expected := "See `PROJ-123`, `APP2-42`, `logs/PROJ-123-run.txt`, and `COMMAND`.\n\n"
 
 	assert.Equal(t, expected, ToJiraMD(input))
 }
