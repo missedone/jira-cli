@@ -107,3 +107,10 @@ func main\(\) {
 
 	assert.Equal(t, expected, ToJiraMD(jfm))
 }
+
+func TestToJiraMDDoesNotWrapIssueKeyCodeSpans(t *testing.T) {
+	input := "See `AGENT-1531`, `DEV2-42`, and `COMMAND`."
+	expected := "See AGENT-1531, DEV2-42, and {{COMMAND}}.\n\n"
+
+	assert.Equal(t, expected, ToJiraMD(input))
+}

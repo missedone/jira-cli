@@ -1,11 +1,15 @@
 package md
 
 import (
+	"regexp"
+
 	cf "github.com/kentaro-m/blackfriday-confluence"
 	bf "github.com/russross/blackfriday/v2"
 
 	"github.com/ankitpokhrel/jira-cli/pkg/md/jirawiki"
 )
+
+var jiraIssueKeyCodeSpan = regexp.MustCompile(`\{\{([A-Z][A-Z0-9]+)\\?-([0-9]+)\}\}`)
 
 // ToJiraMD translates CommonMark to Jira flavored markdown.
 func ToJiraMD(md string) string {
@@ -16,7 +20,7 @@ func ToJiraMD(md string) string {
 	renderer := &cf.Renderer{Flags: cf.IgnoreMacroEscaping}
 	r := bf.New(bf.WithRenderer(renderer), bf.WithExtensions(bf.CommonExtensions))
 
-	return string(renderer.Render(r.Parse([]byte(md))))
+	return jiraIssueKeyCodeSpan.ReplaceAllString(string(renderer.Render(r.Parse([]byte(md)))), "$1-$2")
 }
 
 // FromJiraMD translates Jira flavored markdown to CommonMark.
