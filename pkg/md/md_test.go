@@ -109,8 +109,8 @@ func main\(\) {
 }
 
 func TestToJiraMDDoesNotWrapIssueKeyCodeSpans(t *testing.T) {
-	input := "See `AGENT-1531`, `DEV2-42`, `.codebuddy/test-reports/AGENT-1531-run.json`, and `COMMAND`."
-	expected := "See AGENT-1531, DEV2-42, .codebuddy/test-reports/AGENT-1531-run.json, and {{COMMAND}}.\n\n"
+	input := "See `PROJ-123`, `APP2-42`, `logs/PROJ-123-run.txt`, and `COMMAND`."
+	expected := "See PROJ-123, APP2-42, logs/PROJ-123-run.txt, and {{COMMAND}}.\n\n"
 
 	assert.Equal(t, expected, ToJiraMD(input))
 }
