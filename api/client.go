@@ -167,6 +167,17 @@ func ProxyAssignIssue(c *jira.Client, key string, user *jira.User, def string) e
 	return c.AssignIssue(key, assignee)
 }
 
+// ProxyAddIssueComment uses either a v2 or v3 version of the POST /issue/{key}/comment
+// endpoint to add a comment based on configured installation type.
+// Defaults to v3 if installation type is not defined in the config.
+func ProxyAddIssueComment(c *jira.Client, key, comment string, internal bool) error {
+	it := viper.GetString("installation")
+	if it == jira.InstallationTypeLocal {
+		return c.AddIssueCommentV2(key, comment, internal)
+	}
+	return c.AddIssueComment(key, comment, internal)
+}
+
 // ProxyUserSearch uses either v2 or v3 version of the GET /user/assignable/search
 // endpoint to search for the users assignable to the given issue.
 // Defaults to v3 if installation type is not defined in the config.

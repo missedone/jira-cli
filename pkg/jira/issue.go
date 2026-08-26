@@ -305,22 +305,40 @@ type issueCommentProperty struct {
 	Value issueCommentPropertyValue `json:"value"`
 }
 type issueCommentRequest struct {
-	Body       string                 `json:"body"`
+	Body       interface{}            `json:"body"`
 	Properties []issueCommentProperty `json:"properties"`
 }
 
-// AddIssueComment adds comment to an issue using POST /issue/{key}/comment endpoint.
+// AddIssueComment adds comment to an issue using v3 version of the POST /issue/{key}/comment endpoint.
 func (c *Client) AddIssueComment(key, comment string, internal bool) error {
-	body, err := json.Marshal(&issueCommentRequest{Body: md.ToJiraMD(comment), Properties: []issueCommentProperty{{Key: "sd.public.comment", Value: issueCommentPropertyValue{Internal: internal}}}})
+	return c.addIssueComment(key, md.ToADF(comment), internal, apiVersion3)
+}
+
+// AddIssueCommentV2 adds comment to an issue using v2 version of the POST /issue/{key}/comment endpoint.
+func (c *Client) AddIssueCommentV2(key, comment string, internal bool) error {
+	return c.addIssueComment(key, md.ToJiraMD(comment), internal, apiVersion2)
+}
+
+func (c *Client) addIssueComment(key string, bodyContent interface{}, internal bool, ver string) error {
+	body, err := json.Marshal(&issueCommentRequest{Body: bodyContent, Properties: []issueCommentProperty{{Key: "sd.public.comment", Value: issueCommentPropertyValue{Internal: internal}}}})
 	if err != nil {
 		return err
 	}
 
 	path := fmt.Sprintf("/issue/%s/comment", key)
-	res, err := c.PostV2(context.Background(), path, body, Header{
-		"Accept":       "application/json",
-		"Content-Type": "application/json",
-	})
+	var res *http.Response
+	switch ver {
+	case apiVersion2:
+		res, err = c.PostV2(context.Background(), path, body, Header{
+			"Accept":       "application/json",
+			"Content-Type": "application/json",
+		})
+	default:
+		res, err = c.Post(context.Background(), path, body, Header{
+			"Accept":       "application/json",
+			"Content-Type": "application/json",
+		})
+	}
 	if err != nil {
 		return err
 	}

@@ -103,7 +103,7 @@ func add(cmd *cobra.Command, args []string) {
 		s := cmdutil.Info("Adding comment")
 		defer s.Stop()
 
-		return client.AddIssueComment(ac.params.issueKey, ac.params.body, ac.params.internal)
+		return api.ProxyAddIssueComment(client, ac.params.issueKey, ac.params.body, ac.params.internal)
 	}()
 	cmdutil.ExitIfError(err)
 

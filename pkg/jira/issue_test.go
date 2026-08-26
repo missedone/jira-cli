@@ -524,16 +524,16 @@ func TestAddIssueComment(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "POST", r.Method)
-		assert.Equal(t, "/rest/api/2/issue/TEST-1/comment", r.URL.Path)
+		assert.Equal(t, "/rest/api/3/issue/TEST-1/comment", r.URL.Path)
 		assert.Equal(t, "application/json", r.Header.Get("Accept"))
 		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
 
 		actualBody := new(strings.Builder)
 		_, _ = io.Copy(actualBody, r.Body)
 
-		expectedBody := `{"body":"comment","properties":[{"key":"sd.public.comment","value":{"internal":false}}]}`
+		expectedBody := `{"body":{"version":1,"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"comment"}]}]},"properties":[{"key":"sd.public.comment","value":{"internal":false}}]}`
 
-		assert.Equal(t, expectedBody, actualBody.String())
+		assert.JSONEq(t, expectedBody, actualBody.String())
 
 		if unexpectedStatusCode {
 			w.WriteHeader(400)
@@ -552,6 +552,29 @@ func TestAddIssueComment(t *testing.T) {
 
 	err = client.AddIssueComment("TEST-1", "comment", false)
 	assert.Error(t, &ErrUnexpectedResponse{}, err)
+}
+
+func TestAddIssueCommentV2(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "POST", r.Method)
+		assert.Equal(t, "/rest/api/2/issue/TEST-1/comment", r.URL.Path)
+		assert.Equal(t, "application/json", r.Header.Get("Accept"))
+		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+
+		actualBody := new(strings.Builder)
+		_, _ = io.Copy(actualBody, r.Body)
+
+		expectedBody := `{"body":"comment","properties":[{"key":"sd.public.comment","value":{"internal":false}}]}`
+
+		assert.Equal(t, expectedBody, actualBody.String())
+		w.WriteHeader(201)
+	}))
+	defer server.Close()
+
+	client := NewClient(Config{Server: server.URL}, WithTimeout(3*time.Second))
+
+	err := client.AddIssueCommentV2("TEST-1", "comment", false)
+	assert.NoError(t, err)
 }
 
 func TestAddIssueWorklog(t *testing.T) {
