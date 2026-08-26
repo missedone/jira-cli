@@ -44,6 +44,8 @@ func toADFBlocks(node *bf.Node) []*adf.Node {
 		return []*adf.Node{paragraph(toADFInlines(node, nil))}
 	case bf.List:
 		return []*adf.Node{toADFList(node)}
+	case bf.Table:
+		return []*adf.Node{toADFTable(node)}
 	case bf.Item:
 		return []*adf.Node{toADFListItem(node)}
 	case bf.BlockQuote:
@@ -97,6 +99,56 @@ func toADFListItem(node *bf.Node) *adf.Node {
 	}
 }
 
+func toADFTable(node *bf.Node) *adf.Node {
+	rows := make([]*adf.Node, 0)
+	for child := node.FirstChild; child != nil; child = child.Next {
+		switch child.Type {
+		case bf.TableHead, bf.TableBody:
+			for row := child.FirstChild; row != nil; row = row.Next {
+				if row.Type == bf.TableRow {
+					rows = append(rows, toADFTableRow(row))
+				}
+			}
+		case bf.TableRow:
+			rows = append(rows, toADFTableRow(child))
+		}
+	}
+
+	return &adf.Node{
+		NodeType: adf.NodeTable,
+		Attributes: map[string]any{
+			"isNumberColumnEnabled": false,
+			"layout":                "default",
+		},
+		Content: rows,
+	}
+}
+
+func toADFTableRow(node *bf.Node) *adf.Node {
+	cells := make([]*adf.Node, 0)
+	for child := node.FirstChild; child != nil; child = child.Next {
+		if child.Type == bf.TableCell {
+			cells = append(cells, toADFTableCell(child))
+		}
+	}
+
+	return &adf.Node{NodeType: adf.ChildNodeTableRow, Content: cells}
+}
+
+func toADFTableCell(node *bf.Node) *adf.Node {
+	nodeType := adf.ChildNodeTableCell
+	if node.IsHeader {
+		nodeType = adf.ChildNodeTableHeader
+	}
+
+	content := toADFChildBlocks(node)
+	if len(content) == 0 {
+		content = []*adf.Node{paragraph(toADFInlines(node, nil))}
+	}
+
+	return &adf.Node{NodeType: nodeType, Content: content}
+}
+
 func paragraph(content []*adf.Node) *adf.Node {
 	return &adf.Node{
 		NodeType: adf.NodeParagraph,
@@ -124,7 +176,7 @@ func toADFInlines(node *bf.Node, marks []adf.MarkNode) []*adf.Node {
 			}
 		case bf.Code:
 			if text := string(child.Literal); text != "" {
-				inlines = append(inlines, textNode(text, appendMark(marks, adf.MarkCode, nil)))
+				inlines = append(inlines, textNode(text, appendMark(codeCompatibleMarks(marks), adf.MarkCode, nil)))
 			}
 		case bf.Softbreak, bf.Hardbreak:
 			inlines = append(inlines, &adf.Node{NodeType: adf.InlineNodeHardBreak})
@@ -166,4 +218,14 @@ func appendMark(marks []adf.MarkNode, markType adf.NodeType, attrs any) []adf.Ma
 	next = append(next, marks...)
 	next = append(next, adf.MarkNode{MarkType: markType, Attributes: attrs})
 	return next
+}
+
+func codeCompatibleMarks(marks []adf.MarkNode) []adf.MarkNode {
+	compatible := make([]adf.MarkNode, 0, len(marks))
+	for _, mark := range marks {
+		if mark.MarkType == adf.MarkLink {
+			compatible = append(compatible, mark)
+		}
+	}
+	return compatible
 }
