@@ -80,7 +80,7 @@ curl -fsSL https://raw.githubusercontent.com/missedone/jira-cli/main/install.sh 
 To install a specific release, pass its tag to the installer:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/missedone/jira-cli/main/install.sh | bash -s -- v1.8.1
+curl -fsSL https://raw.githubusercontent.com/missedone/jira-cli/main/install.sh | bash -s -- v1.8.3
 ```
 
 The installer writes to `/usr/local/bin` by default. Set `JIRA_CLI_INSTALL_DIR` to use another directory:
@@ -94,7 +94,7 @@ curl -fsSL https://raw.githubusercontent.com/missedone/jira-cli/main/install.sh 
 In PowerShell, set the version you want to install and download its `windows_x86_64` package from [GitHub Releases](https://github.com/missedone/jira-cli/releases):
 
 ```powershell
-$version = "1.8.1"
+$version = "1.8.3"
 $archive = "jira_${version}_windows_x86_64.zip"
 $archivePath = Join-Path $env:TEMP $archive
 $installDir = "$env:LOCALAPPDATA\Programs\jira-cli"
