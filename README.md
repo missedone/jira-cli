@@ -139,12 +139,12 @@ Follow the [installation guide](https://github.com/ankitpokhrel/jira-cli/wiki/In
 
 #### Cloud server
 
-1. [Get a Jira API token](https://id.atlassian.com/manage-profile/security/api-tokens) and export it to your shell as
-   a `JIRA_API_TOKEN` variable. Add it to your shell configuration file, for instance, `$HOME/.bashrc`, so that the
-   variable is always available. Alternatively, you can also use `.netrc` file or `keychain` to set the token. Learn
+1. Run `jira init`, select installation type as `Cloud`, and provide required details to generate a config file required
+   for the tool. If no API token is found, `jira init` prompts for it and stores it in your system keyring.
+   Alternatively, you can [get a Jira API token](https://id.atlassian.com/manage-profile/security/api-tokens) and
+   export it to your shell as a `JIRA_API_TOKEN` variable. Add it to your shell configuration file, for instance,
+   `$HOME/.bashrc`, so that the variable is always available. You can also use a `.netrc` file to set the token. Learn
    more [here](https://github.com/ankitpokhrel/jira-cli/discussions/356).
-2. Run `jira init`, select installation type as `Cloud`, and provide required details to generate a config file required
-   for the tool.
 
 #### On-premises installation
 

@@ -11,6 +11,7 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/spf13/viper"
+	"github.com/zalando/go-keyring"
 
 	"github.com/ankitpokhrel/jira-cli/api"
 	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
@@ -84,6 +85,7 @@ type JiraCLIConfigGenerator struct {
 			major, minor, patch int
 		}
 		login        string
+		apiToken     string
 		authType     jira.AuthType
 		project      *projectConf
 		board        *jira.Board
@@ -410,7 +412,46 @@ func (c *JiraCLIConfigGenerator) configureServerAndLoginDetails() error {
 		}
 	}
 
+	if err := c.configureAPIToken(); err != nil {
+		return err
+	}
+
 	return c.verifyLoginDetails(c.value.server, c.value.login)
+}
+
+func (c *JiraCLIConfigGenerator) configureAPIToken() error {
+	// mTLS and cf-access don't need a Jira API token.
+	if c.value.authType == jira.AuthTypeMTLS || c.value.authType == jira.AuthTypeCFAccess {
+		return nil
+	}
+	if api.GetAPIToken(jira.Config{Server: c.value.server, Login: c.value.login}) != "" {
+		return nil
+	}
+
+	help := "This is the password or personal access token you use to authenticate with Jira."
+	if c.value.installation == jira.InstallationTypeCloud {
+		help = "Generate an API token at https://id.atlassian.com/manage-profile/security/api-tokens"
+	}
+
+	var token string
+	prompt := &survey.Password{
+		Message: "Jira API token:",
+		Help:    help,
+	}
+	if err := survey.AskOne(prompt, &token, survey.WithValidator(func(val interface{}) error {
+		if str, ok := val.(string); !ok || strings.TrimSpace(str) == "" {
+			return fmt.Errorf("token cannot be empty")
+		}
+		return nil
+	})); err != nil {
+		return err
+	}
+	trimmed := strings.TrimSpace(token)
+	if trimmed != token {
+		cmdutil.Warn("Removed leading/trailing whitespace from the entered token.")
+	}
+	c.value.apiToken = trimmed
+	return nil
 }
 
 func (c *JiraCLIConfigGenerator) verifyLoginDetails(server, login string) error {
@@ -422,6 +463,7 @@ func (c *JiraCLIConfigGenerator) verifyLoginDetails(server, login string) error 
 	c.jiraClient = api.Client(jira.Config{
 		Server:   server,
 		Login:    login,
+		APIToken: c.value.apiToken,
 		Insecure: &c.usrCfg.Insecure,
 		AuthType: &c.value.authType,
 		Debug:    viper.GetBool("debug"),
@@ -442,6 +484,15 @@ func (c *JiraCLIConfigGenerator) verifyLoginDetails(server, login string) error 
 	c.value.server = server
 	c.value.login = login
 	c.value.timezone = ret.Timezone
+
+	// Persist the token so subsequent invocations can resolve it via api.GetAPIToken.
+	if c.value.apiToken != "" {
+		if err := keyring.Set("jira-cli", login, c.value.apiToken); err != nil {
+			cmdutil.Warn(
+				"Unable to store the API token in the system keyring: %s\n"+
+					"Export it as the JIRA_API_TOKEN environment variable to make it available to jira-cli.", err)
+		}
+	}
 
 	return nil
 }
